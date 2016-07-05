@@ -7,9 +7,6 @@ services:
   jenkins:
     restart: always
     image: jenkins:1.651.3
-    ports:
-      - "50000:50000"
-      - "8080:8080"
     volumes:
       - jenkins_data:/var/jenkins_home
     environment:
