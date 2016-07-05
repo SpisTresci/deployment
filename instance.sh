@@ -1,4 +1,5 @@
 #!/bin/bash
+set -eu
 set -o allexport
 
 CMD=$1
@@ -40,6 +41,27 @@ create_instance(){
   docker-compose run django python manage.py migrate
 }
 
+is_ready() {
+  URL=$1
+  WAIT_SLEEP=3
+  WAIT_LOOPS=80
+  i=0
+  until curl -s -o /dev/null -w "%{http_code}" --fail http://$URL/ > /dev/null
+  do
+
+      i=`expr $i + 1`
+      if [ $i -ge $WAIT_LOOPS ]; then
+          echo "$(date) - still not ready, giving up"
+          exit 1
+      fi
+      echo "$(date) - waiting to be ready"
+      sleep $WAIT_SLEEP
+  done
+  echo "http://$URL/ is ready!"
+}
+
+
+
 if [ $CMD = "remove" ]; then
   remove_instance
 fi
@@ -47,6 +69,7 @@ fi
 if [ $CMD = "create" ]; then
   remove_instance
   create_instance
+  is_ready $NAME.$DOMAIN
 fi
 
 

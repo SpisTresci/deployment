@@ -1,4 +1,5 @@
 #!/bin/bash
+set -eu
 
 FORK=$1
 BRANCH=$2
